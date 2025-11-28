@@ -1,14 +1,19 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import authRoutes from "./routes/auth.routes.js";
+import messageRoute from "./routes/message.route.js"
 import path from "path";
 import { fileURLToPath } from "url";
 import { connectDB } from './lib/db.js';
+import cookieParser from "cookie-parser";
+
 
 dotenv.config();
 
 const app = express();
 app.use(express.json())
+app.use(cookieParser());
+
 
 // Fix __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +25,7 @@ app.use(express.json());
 
 // API routes
 app.use("/api/auth", authRoutes);
+app.use("/api/messages",messageRoute)
 
 // Serve frontend in production
 if (process.env.NODE_ENV === "production") {
