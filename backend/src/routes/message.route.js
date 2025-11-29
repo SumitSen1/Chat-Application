@@ -1,5 +1,5 @@
 import express from "express";
-import arcjetProtection from "../middlewares/arcjet.middleware.js"
+import {arcjetProtection} from "../middlewares/arcjet.middleware.js"
 import {protectRoute} from "../middlewares/protectRoute.js"
 import { getAllUsers, getChatPartners, getMessageByUserId, sendMessage } from "../controllers/message.controller.js";
 
