@@ -51,6 +51,7 @@ export const signup = async (req, res) => {
     });
 
     const savedUser = await newUser.save();
+    generateToken(savedUser._id, res);
 
     // Response
     return res.status(201).json({
@@ -90,6 +91,8 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password || user is not found" });
     }
     generateToken(user._id,res);
+    console.log(generateToken(user._id,res));
+    
     // Response
     return res.status(200).json({
       message: "Login successful",
@@ -106,7 +109,8 @@ export const login = async (req, res) => {
 }
 };
 export const logout = async (req,res)=>{
-  res.cookie("token","",{maxAge:0,httpOnly:true});
+  res.cookie("jwt","",{maxAge:0,httpOnly:true});
+
   return res.status(200).json({message:"Logout Successful"});
 }
 export const updateProfilePic = async (req,res)=>{
