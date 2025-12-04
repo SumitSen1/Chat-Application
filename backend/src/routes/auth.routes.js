@@ -1,20 +1,29 @@
-import express, { json } from 'express';
-import { signup,login,logout ,updateProfilePic} from '../controllers/auth.controller.js';
-import { protectRoute } from '../middlewares/protectRoute.js';
-import { arcjetProtection } from '../middlewares/arcjet.middleware.js';
+import express from "express";
+import { signup, login, logout, updateProfile } from "../controllers/auth.controller.js";
+import { protectRoute } from "../middlewares/protectRoute.js"
+import { arcjetProtection } from "../middlewares/arcjet.middleware.js";
+import multer from 'multer';
 
-const router = express.Router()
-// router.use(arcjetProtection)
-// arcjet protection doesn't fix yet
+const router = express.Router();
 
-router.get("/test",arcjetProtection,(req,res)=>{res.status(200).json({message:"Test Route"})})
-    
-router.post("/signup",signup)
-router.post("/login",login)
+// multer for multipart/form-data (memory storage)
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
-router.post("/logout",logout)
+// router.use(arcjetProtection);
 
-router.put("/update-profile",protectRoute,updateProfilePic)
-router.get("/check-auth",(req,res)=> res.status(200).json(req.user));
+router.post("/signup", signup);
+router.post("/login", login);
+router.post("/logout", logout);
 
-export default router
+// Accept either multipart/form-data (field 'profilePic') or base64 in body.profilePic
+router.put("/update-profile", protectRoute, upload.single('profilePic'), updateProfile);
+
+// Protected route to check auth and return sanitized user
+router.get("/check-auth", protectRoute, (req, res) => res.status(200).json({
+	_id: req.user._id,
+	fullName: req.user.fullName,
+	email: req.user.email,
+	profilePic: req.user.profilePic
+}));
+
+export default router;

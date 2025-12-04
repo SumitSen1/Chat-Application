@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 export const useAuthStore = create((set,get)=>({
 
     authUser : null,
+    onlineUsers: [],
     isCheckingAuth : true,
     isSigningUp: false,
     isLoggingIn:false,
@@ -17,7 +18,7 @@ export const useAuthStore = create((set,get)=>({
             
             set({authUser:res.data});
         } catch (error) {
-            console.log("Error in AuthCheck :", error.response.data.message);
+            console.log("Error in AuthCheck :", error.response?.data?.message || error.message);
             set({authUser: null})
         }finally{
             set({isCheckingAuth:false})
@@ -47,7 +48,6 @@ export const useAuthStore = create((set,get)=>({
             set({isLoggingIn:false})
         }
     },
-
     logout: async()=>{
         try {
             const res = await axiosInstance.post("auth/logout")
@@ -57,6 +57,18 @@ export const useAuthStore = create((set,get)=>({
             toast.error(error.response?.data?.message || "Logout failed")
             console.log("Error in logout ",error);
             
+        }
+    },
+    updateProfile: async(data)=>{
+        try {
+            // If data is FormData, axios will set proper headers automatically.
+            const res = await axiosInstance.put("/auth/update-profile", data)
+            // backend returns { message, user }
+            set({authUser: res.data.user})
+            toast.success("Profile updated successfully")
+        } catch (error) {
+            console.log("error in update profile: ",error);
+            toast.error(error.response?.data?.message || "Profile update failed")
         }
     }
 }))

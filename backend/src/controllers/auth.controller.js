@@ -113,21 +113,61 @@ export const logout = async (req,res)=>{
 
   return res.status(200).json({message:"Logout Successful"});
 }
-export const updateProfilePic = async (req,res)=>{
-  try {const userId = req.user._id;
-  const {profilePic } = req.body;
-  if(!profilePic){ return res.status(400).json({message:"Profile picture is required"});}
+export const updateProfile = async (req,res)=>{
+  try {
+    const userId = req.user._id;
 
-  const uploadResponse = await cloudinary.uploader.upload(profilePic)
-  const updateUser = await User.findByIdAndUpdate(
-    userId,
-    {profilePic:uploadResponse.secure_url},
-    {new:true}
-  )
-  return res.status(200).json({message:"Profile picture updated successfully",user:updateUser});
-}
-  catch(error){
-    console.log("Error while updateProfilePic :",error);
-    res.status(500).json({message:"Internal server error"});
+    console.log("updateProfile called", {
+      hasFile: !!req.file,
+      fileSize: req.file?.size,
+      bodyKeys: Object.keys(req.body || {}),
+    });
+
+    // If multer provided a file (multipart/form-data), use its buffer
+    if (req.file && req.file.buffer) {
+      try {
+        const buffer = req.file.buffer;
+        const uploadResponse = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'profile_pics' }, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          });
+          uploadStream.end(buffer);
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { profilePic: uploadResponse.secure_url },
+          { new: true }
+        );
+
+        return res.status(200).json({ message: 'Profile picture updated successfully', user: updatedUser });
+      } catch (err) {
+        console.error('Cloudinary upload (stream) failed:', err);
+        return res.status(500).json({ message: 'Cloudinary upload failed', error: err.message });
+      }
+    }
+
+    // Fallback: accept base64 string in body.profilePic
+    const { profilePic } = req.body || {};
+    if (profilePic) {
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { profilePic: uploadResponse.secure_url },
+          { new: true }
+        );
+        return res.status(200).json({ message: 'Profile picture updated successfully', user: updatedUser });
+      } catch (err) {
+        console.error('Cloudinary upload (base64) failed:', err);
+        return res.status(500).json({ message: 'Cloudinary upload failed', error: err.message });
+      }
+    }
+
+    return res.status(400).json({ message: 'Profile picture is required' });
+  } catch (error) {
+    console.log("Error in update profile:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};

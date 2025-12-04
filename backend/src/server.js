@@ -12,7 +12,9 @@ dotenv.config();
 
 const app = express();
 app.use(cors({origin:process.env.CLIENT_URL,credentials:true}))
-app.use(express.json())
+// Increase payload size to allow base64 image uploads from the frontend
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser())
 
 
@@ -22,7 +24,9 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
+// Increase payload size to allow base64 image uploads from the frontend
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // API routes
 app.use("/api/auth", authRoutes);
