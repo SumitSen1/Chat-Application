@@ -1,6 +1,8 @@
 import cloudinary from "../lib/cloudinary.js";
+import {io,getRecieverSocketId} from "../lib/socket.js"
 import Message from "../models/message.model.js";
 import User from "../models/User.model.js";
+
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -44,6 +46,7 @@ export const sendMessage = async (req, res) => {
     if (senderId.equals(receiverId)) {
       return res.status(400).json({ message: "Cannot send messages to yourself." });
     }
+
     const receiverExists = await User.exists({ _id: receiverId });
     if (!receiverExists) {
       return res.status(404).json({ message: "Receiver not found." });
@@ -62,35 +65,53 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
+
+    const receiverSocketId = getRecieverSocketId(receiverId);
+    if (receiverSocketId) {
+      console.log(`Emitting newMessage to socket ${receiverSocketId} for receiver ${receiverId}`);
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error occur in sendMessage :", error);
     res.status(500).json({ message: "Error in sendMessage :", error });
   }
 };
-export const getChatPartners = async (req,res)=>{
+export const getChatPartners = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    const message = await Message.find({
-      $or:[{senderId:loggedInUserId},{receiverId:loggedInUserId}]
-    })
+    const messages = await Message.find({
+      $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
+    });
 
     const chatPartnerIds = [
       ...new Set(
-        message.map((msg)=>
-        msg.senderId.toString()=== loggedInUserId.toString()
-        ? msg.receiverId.toString()
-        : msg.senderId.toString()  
+        messages
+          .map((msg) => {
+            if (!msg?.senderId || !msg?.receiverId) {
+              console.log("⚠️ Missing sender/receiver in message:", msg);
+              return null;
+            }
 
-      )
-    )
-  ] 
-  const chatPartners = await User.find({_id:{$in:chatPartnerIds}}).select("-password")
+            return msg.senderId.toString() === loggedInUserId.toString()
+              ? msg.receiverId.toString()
+              : msg.senderId.toString();
+          })
+          .filter(Boolean)
+      ),
+    ];
 
-  res.status(200).json(chatPartners)
+    const chatPartners = await User.find({
+      _id: { $in: chatPartnerIds },
+    }).select("-password");
+
+    res.status(200).json(chatPartners);
   } catch (error) {
-    console.log("Error occur in getChatPartners :",error);
-    res.status(500).json({message:"Error occur in getChatPartners :",error})
+    console.log("Error occur in getChatPartners :", error);
+    res
+      .status(500)
+      .json({ message: "Error occur in getChatPartners", error });
   }
-}
+};

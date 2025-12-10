@@ -64,7 +64,7 @@ function LoginPage() {
                       <LockIcon className="auth-input-icon" />
 
                       <input
-                        type="text"
+                        type="password"
                         value={formData.password}
                         onChange={(e) =>
                           setFormsData({

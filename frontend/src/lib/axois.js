@@ -3,7 +3,7 @@ import axios from "axios"
 //FROM COPILOT
 
 // Allow overriding API URL via Vite env `VITE_API_URL`, otherwise fall back to localhost in dev
-const resolvedBaseURL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === "development" ? "http://localhost:3000/api" : "/api");
+const resolvedBaseURL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === "development" ? "http://localhost:3001/api" : "/api");
 
 export const axiosInstance = axios.create({
     baseURL: resolvedBaseURL,

@@ -1,10 +1,10 @@
 import {Routes,Route, Navigate} from "react-router"
-import ChatPage from './page/ChatPage'
-import LoginPage from './page/LoginPage'
-import SignUpPage from './page/SignUpPage'
-import { useAuthStore } from "./store/useAuthStore"
+import ChatPage from './page/ChatPage.jsx'
+import LoginPage from './page/LoginPage.jsx'
+import SignUpPage from './page/SignUpPage.jsx'
+import { useAuthStore } from "./store/useAuthStore.js"
 import { useEffect } from "react"
-import PageLoader from "./components/PageLoader"
+import PageLoader from "./components/PageLoader.jsx"
 import {Toaster} from "react-hot-toast"
 
 function App() {

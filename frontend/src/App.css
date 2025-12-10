@@ -42,3 +42,18 @@
 .read-the-docs {
   color: #888;
 }
+
+
+/* styles.css */
+@keyframes borderRotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.animate-border {
+  --border-angle: 0deg;
+  animation: borderRotate 4s linear infinite;
+}
+
+
