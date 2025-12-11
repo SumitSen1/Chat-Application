@@ -1,13 +1,16 @@
 import axios from "axios"
 
-//FROM COPILOT
-
-// Allow overriding API URL via Vite env `VITE_API_URL`, otherwise fall back to localhost in dev
-const resolvedBaseURL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === "development" ? "http://localhost:3001/api" : "/api");
+// Determine baseURL based on environment:
+// - In development: use http://localhost:3001/api (local backend)
+// - In production: use VITE_API_URL or default to /api (relative, assumes same origin)
+const baseURL = import.meta.env.VITE_API_URL || 
+    (import.meta.env.MODE === "development" 
+        ? "http://localhost:3001/api" 
+        : "/api");
 
 export const axiosInstance = axios.create({
-    baseURL: "https://chat-application-r2ep.onrender.com",
-    withCredentials:true,
+    baseURL: baseURL,
+    withCredentials: true,
 })
 
 // Debug: expose/print baseURL so it's easy to spot incorrect resolves in browser console
