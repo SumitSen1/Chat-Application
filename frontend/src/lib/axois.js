@@ -6,7 +6,7 @@ import axios from "axios"
 const resolvedBaseURL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === "development" ? "http://localhost:3001/api" : "/api");
 
 export const axiosInstance = axios.create({
-    baseURL: "https://chat-application-one-chi.vercel.app",
+    baseURL: "https://chat-application-r2ep.onrender.com",
     withCredentials:true,
 })
 

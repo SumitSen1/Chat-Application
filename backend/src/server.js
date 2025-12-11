@@ -10,9 +10,11 @@ import cors from "cors"
 import { app,server } from './lib/socket.js';
 
 dotenv.config();
-
+// https://chat-application-one-chi.vercel.app/login
 // const app = express();    we use this in socket.js
-app.use(cors({origin:process.env.CLIENT_URL,credentials:true}))
+app.use(cors({
+    origin:"https://chat-application-one-chi.vercel.app/login"
+    ,credentials:true}))
 // Increase payload size to allow base64 image uploads from the frontend
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
