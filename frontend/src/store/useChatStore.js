@@ -108,6 +108,10 @@ export const useChatStore = create((set, get) => ({
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
+    try{socket.off("Message") }
+    catch(e){
+      toast.error();
+      console.log("error while logOut");
+    }
   },
 }));
