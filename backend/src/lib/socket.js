@@ -2,17 +2,38 @@ import { Server } from "socket.io";
 import http from 'http'
 import express from 'express'
 import { socketAuthMiddleware } from "../middlewares/auth.Socket.Middleware.js";
+import dotenv from 'dotenv';
+
+// ensure environment variables are loaded when this module runs
+dotenv.config();
 
 const app = express()
 const server  = http.createServer(app)
+// Build allowed origins from env: prefer CLIENT_ORIGINS (comma-separated),
+// fallback to CLIENT_URL for single origin.
+const allowed = (process.env.CLIENT_ORIGINS || process.env.CLIENT_URL || "")
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
 
-const io = new Server(server,{
-    cors:{
-        origin: process.env.CLIENT_URL,
-        credentials: true,
-        methods: ['GET', 'POST'],
-    }
-})
+let corsOptions;
+if (process.env.NODE_ENV !== 'production') {
+  // permissive in development to allow localhost dev servers
+  corsOptions = { origin: true, credentials: true, methods: ['GET', 'POST'] };
+} else {
+  corsOptions = {
+    origin: (origin, callback) => {
+      // allow requests with no origin (mobile apps, curl, same-origin)
+      if (!origin) return callback(null, true);
+      if (allowed.includes(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'), false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST'],
+  };
+}
+
+const io = new Server(server, { cors: corsOptions });
 
 //appply authentication middleware to all socket connection
 io.use(socketAuthMiddleware);

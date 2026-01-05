@@ -1,14 +1,30 @@
-import { MessageCircleIcon } from "lucide-react";
+import { MessageCircleIcon,House  } from "lucide-react";
+import { useState } from "react";
+import ChatsList from "./ChatsList";
+import ContactList from "./ContactList";
 
 const NoConversationPlaceholder = () => {
+  const [toggle, setToggle] = useState(true);
+  // <div className={`w-80  bg-slate-800/50 backdrop-blur-sm ${(toggle)?"flex":"hidden"} flex-col`}></div>
   return (
     <div className="flex flex-col items-center justify-center h-full text-center p-6">
+      <button
+        onClick={() => {
+          setToggle(!toggle);
+          activeTab === "chats"?<ChatsList/>:<ContactList/>;
+        }}
+      >
+        {/* <Blinds className="w-6 h-6 hover:size-6.5  " /> */}
+      </button>
       <div className="size-20 bg-cyan-500/20 rounded-full flex items-center justify-center mb-6">
         <MessageCircleIcon className="size-10 text-cyan-400" />
       </div>
-      <h3 className="text-xl font-semibold text-slate-200 mb-2">Select a conversation</h3>
+      <h3 className="text-xl font-semibold text-slate-200 mb-2">
+        Select a conversation
+      </h3>
       <p className="text-slate-400 max-w-md">
-        Choose a contact from the sidebar to start chatting or continue a previous conversation.
+        Choose a contact from the sidebar to start chatting or continue a
+        previous conversation.
       </p>
     </div>
   );

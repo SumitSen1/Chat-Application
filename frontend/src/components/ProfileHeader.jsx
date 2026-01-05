@@ -2,14 +2,19 @@ import { useState, useRef } from "react";
 import { LogOutIcon, VolumeOffIcon, Volume2Icon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
+import { Blinds } from "lucide-react";
+import ContactList from "./ContactList";
+import ChatsList from "./ChatsList";
 
 const mouseClickSound = new Audio("/sounds/mouse-click.mp3");
 
 
-function ProfileHeader() {
+function ProfileHeader(activeTab) {
   const { logout, authUser, updateProfile } = useAuthStore();
   const { isSoundEnabled, toggleSound } = useChatStore();
   const [selectedImg, setSelectedImg] = useState(null);
+  /* for hamburger*/
+  // const [toggle,setToggle] = useState(true); 
 
   const fileInputRef = useRef(null);
 
@@ -27,8 +32,13 @@ function ProfileHeader() {
 
     await updateProfile(formData);
     // release object URL after some time if needed
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 10000); 
+
+    <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      {activeTab === "chats" ? <ChatsList/> : <ContactList/>}
+    </div>
   };
+
 
   return (
     <div className="p-6 border-b border-slate-700/50">
@@ -95,6 +105,9 @@ function ProfileHeader() {
               <VolumeOffIcon className="size-5" />
             )}
           </button>
+
+        {/* <button onClick={()=>{setToggle(!toggle)}}><Blinds className="w-6 h-6"/></button> */}
+
         </div>
       </div>
     </div>
