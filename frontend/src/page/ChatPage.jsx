@@ -12,7 +12,7 @@ function ChatPage() {
   const {toggle,setToggle} = useChatStore();
   const {activeTab,selectedUser} = useChatStore();
   return (
-    <div className="relative w-full max-w-6xl h-[800px] p-1">
+    <div className="relative w-full max-w-6xl h-screen sm:h-[800px] p-1 ">
        <BorderAnimatedContainer>
         {/* <button onClick={()=>{setToggle(!toggle)}}>CLick</button> */}
         {/* LeftSide */}
